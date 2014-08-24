@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Predict the probability of being admitted by graduate school</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Predict the probability of being admitted by graduate school">
+  <meta name="author" content="pepper416">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="http://slidifylibraries2.googlecode.com/git/inst/libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/js/slides" 
+    src="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Predict the probability of being admitted by graduate school</h1>
+    <h2>Logistic Regress</h2>
+    <p>pepper416<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Data Description</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A researcher is interested in how variables, such as GRE (Graduate Record Exam scores),
+        GPA (grade point average) and prestige of the undergraduate institution, effect admission
+        into graduate school. The response variable, admit/don&#39;t admit, is a binary variable.</p>
+
+<p>The dataset can be downloaded from <a href="http://www.ats.ucla.edu/stat/data/binary.csv">http://www.ats.ucla.edu/stat/data/binary.csv</a></p>
+
+<pre><code class="r">mydata &lt;- read.csv(&quot;http://www.ats.ucla.edu/stat/data/binary.csv&quot;)
+head(mydata)
+</code></pre>
+
+<pre><code>##   admit gre  gpa rank
+## 1     0 380 3.61    3
+## 2     1 660 3.67    3
+## 3     1 800 4.00    1
+## 4     1 640 3.19    4
+## 5     0 520 2.93    4
+## 6     1 760 3.00    2
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Logistic regression model</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Since the response variable <code>admit</code> is binary, we can fit a logistic regress model to predict the probability of being admitted by graduate school.</p>
+
+<pre><code class="r">mydata$rank &lt;- factor(mydata$rank)
+mylogit &lt;- glm(admit ~ gre + gpa + rank, data = mydata, family = &quot;binomial&quot;)
+summary(mylogit)$coefficients
+</code></pre>
+
+<pre><code>##                 Estimate  Std. Error   z value     Pr(&gt;|z|)
+## (Intercept) -3.989979073 1.139950936 -3.500132 0.0004650273
+## gre          0.002264426 0.001093998  2.069864 0.0384651284
+## gpa          0.804037549 0.331819298  2.423119 0.0153878974
+## rank2       -0.675442928 0.316489661 -2.134171 0.0328288188
+## rank3       -1.340203916 0.345306418 -3.881202 0.0001039415
+## rank4       -1.551463677 0.417831633 -3.713131 0.0002047107
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Prediction</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">GRE = 1600
+GPA = 4
+Rank = 1
+pred = predict(mylogit,newdata=list(gre=GRE,gpa=GPA,rank=as.factor(Rank)),
+                interval=(&quot;confidence&quot;),type = &quot;link&quot;, se = TRUE)
+PredictedProb &lt;- plogis(pred$fit)
+</code></pre>
+
+<p>Based on our model, if a student has GRE = 1600, GPA= 4, and graduates from the university with prestige rank 1, the predicted probability of being admitted is 0.95.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h3>Box plot of GRE score vs GPA</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r"># assign the GPA into different groups
+mydata$gpa_group = cut(mydata$gpa, breaks = c(2,2.5,3,3.5,4))
+# make a boxplot of GRE by GPA
+boxplot(gre~gpa_group, mydata, main = &quot;boxplot of GRE vs GPA&quot;,
+        xlab = &quot;GPA&quot;, ylab = &quot;GRE&quot;, col = &quot;grey&quot;)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAtAAAAFoCAMAAABJ+DwrAAAAkFBMVEX9/v0AAAAAADkAAGUAOTkAOY8AZo8AZrU5AAA5ADk5AGU5OWU5OY85ZrU5j9plAABlADllAGVlOQBlOY9lZmVltf2POQCPOTmPOWWPjzmPj2WPj7WP27WP29qP2/21ZgC1ZmW1tWW124+1/tq1/v2+vr7ajzna24/a/rXa/v39tWX924/929r9/rX9/tr9/v02b+F9AAAAMHRSTlP//////////////////////////////////////////////////////////////wBipdB4AAAACXBIWXMAAAsSAAALEgHS3X78AAAOv0lEQVR4nO2da2PiuBlGl+xuSadTMm03me1lQy9T2oUG//9/V0s2GIzjSyTZD6/O+ZDxIOM8kg+KLED+rgAwxHdLBwCICUKDKRAaTIHQYAqEBlMgNJgCocEUCA2mQGgwBUKDKRAaTIHQYAqEBlMgNJgCocEUCA2mQGgwBUKDKRAaTIHQYAqEBlMgNJgCocEUCA2mQGgwBUKP4vjy/beBXd6ernbZPrfKD4+rh9f6YKuV3357WjnK59Vb9Q7vZbh+2nP12Hp6bSyD0KOYLPR21Rb6/Ehpdi1kbebqx19HCH3zNLdz+eBgsLxA6FGUQv/DiVdu7kqXNk6l77+V/eNzVeI7WadWVeo707rrvHjEP7/qVMufTmP3FPfz7cmXVWz9U91PJ3Et7NXT3M5bl2K3+unmlZM3CD0K76M3cus31r7H3Zf/nku8nXXphdCXj3hpD4/VP59Or4Ebofdux7enh9eqK65Krp52Erp8Nf3zkTHHJQg9itLHjXfs8Fj+pXcb5Y8fyk76VLJ6dl42pacBxu0j+2bUexpyrE9blbvHl3J3Z3Ut8TtPK3c6PK5HDIayAqFHUWlTd8ruL/2zU8z9rEp2q40Tuim91vfmkb2/Fmyu7q6Edkfzu/tHa19vnuaG0O64O8YclyD0KLqE3vmx9GShfbd7MtPbuSmKqyGH+99//WjEXwhWV4pXT6t3roc7jDkuQOhRdAw5Do+/cUODyUMOf11XvRD8GLqU9rkldLF9+IvTvNqunnf1tHrneuKDMccFCD2K24tCN9B1vWbnRaG/Fry6KOyYtlufJ0bOg4+LXepJucbXy6ddDE26ZghzBqFH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" alt="plot of chunk unnamed-chunk-4"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Data Description'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Logistic regression model'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Prediction'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Box plot of GRE score vs GPA'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="http://slidifylibraries2.googlecode.com/git/inst/libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
