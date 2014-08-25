@@ -1,5 +1,13 @@
 DS09_slidify
 ============
+## Updata: Please find my link from [http://pepper416.github.io/DS09_slidify_final/index.html](http://pepper416.github.io/DS09_slidify_final/index.html)
+
+This website is extreamly useful for people who can't publish the slidify presentation to github!!
+[http://www.scribd.com/doc/234574197/Publishing-Slidify](http://www.scribd.com/doc/234574197/Publishing-Slidify).
+
+
+----
+
 I just realized the link that I provided in the Coursera Course Project submission page is invalid. I don't know why...
 
 One solution is :
