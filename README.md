@@ -1,2 +1,3 @@
 DS09_slidify
 ============
+I just realized the link that I provided in the Coursera Course Project submission page is invalid. I don't know why...
